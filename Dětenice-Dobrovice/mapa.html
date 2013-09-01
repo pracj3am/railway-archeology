@@ -26,16 +26,20 @@
 			var layer = new SMap.Layer.Marker();
 			m.addLayer(layer).enable();
 		
-			var marker, markers = [], coord, coords = [], card, cards = [];
+			var marker, markers = [], coord, coords = [], card, cards = [], markerNode, d;
 			for (var i = 0; i < data.length; i++) {
 				coord = SMap.Coords.fromWGS84(data[i].longitude, data[i].latitude);
 				if (i > 0 && coord.distance(coords[i-1]) < 15) {
 					// moc blízko
-					coord = SMap.Coords.fromWGS84(data[i].longitude - .02/60, data[i].latitude);
+					coord = SMap.Coords.fromWGS84(data[i].longitude - .015/60, data[i].latitude);
 				}
 				coords.push(coord);
 
-				markers.push(marker = new SMap.Marker(coord, null, {title: data[i].title}));
+				markerNode = JAK.mel('div', {title: data[i].title});
+				markerNode.appendChild(JAK.mel('img', {src: SMap.CONFIG.img + '/marker/drop-red.png'}));
+				markerNode.appendChild(d = JAK.mel('div', {}, {position: 'absolute', left: '0px', top: '2px', textAlign: 'center', width: '22px', color: 'white', fontSize: '14px', lineHeight: '16px', fontWeight: 'bold'}));
+				d.innerHTML = i+1;
+				markers.push(marker = new SMap.Marker(coord, null, {url: markerNode}));
 				cards.push(card = new SMap.Card());
 				card.setSize(800, 730);
 				card.getHeader().innerHTML = data[i].title;
