@@ -1,0 +1,1 @@
+for i in *.jpg; do echo $i","`exif -t DateTime -m "$i"`,'"'`exif -t InteroperabilityVersion -m "$i"`'"','"'`exif -t Longitude -m "$i"`'"'; done
