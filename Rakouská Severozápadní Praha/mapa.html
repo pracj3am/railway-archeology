@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+		<style>
+			html, body, div#m {height: 100%}
+		</style>
+		<script type="text/javascript" src="http://api4.mapy.cz/loader.js"></script>
+		<script type="text/javascript">Loader.load();</script>
+		<script type="text/javascript" src="data.js"></script>
+	</head>
+	<body>
+		<div id="m"></div>
+		<script type="text/javascript">
+			var m = new SMap(document.getElementById("m"));
+			m.addControl(new SMap.Control.Sync());
+			m.addDefaultLayer(SMap.DEF_SMART_BASE).enable();
+			m.addDefaultLayer(SMap.DEF_OPHOTO);
+			m.addDefaultLayer(SMap.DEF_OPHOTO0406);
+			m.addDefaultLayer(SMap.DEF_OPHOTO0203);
+			m.addDefaultLayer(SMap.DEF_HISTORIC);
+			m.addDefaultControls();
+
+			var layerControl = new SMap.Control.Layer();
+			m.addControl(layerControl);
+			layerControl.addDefaultLayer(SMap.DEF_SMART_BASE);
+			layerControl.addDefaultLayer(SMap.DEF_OPHOTO);
+			layerControl.addDefaultLayer(SMap.DEF_OPHOTO0406);
+			layerControl.addDefaultLayer(SMap.DEF_OPHOTO0203);
+			layerControl.addDefaultLayer(SMap.DEF_HISTORIC);
+		
+			var layer = new SMap.Layer.Marker();
+			m.addLayer(layer).enable();
+		
+			var marker, markers = [], coord, coords = [], card, cards = [], markerNode, d;
+			for (var i = 0; i < data.length; i++) {
+				coord = SMap.Coords.fromWGS84(data[i].longitude, data[i].latitude);
+				if (i > 0 && coord.distance(coords[i-1]) < 15) {
+					// moc blízko
+					coord = SMap.Coords.fromWGS84(data[i].longitude - .015/60, data[i].latitude);
+				}
+				coords.push(coord);
+
+				markers.push(marker = new SMap.Marker(coord, null, {title: data[i].title}));
+				cards.push(card = new SMap.Card());
+				card.setSize(data[i].width, data[i].height + 130);
+				card.getHeader().innerHTML = data[i].title;
+				card.getBody().innerHTML = '<img src="medium/' + data[i].photo + '"/>';
+				card.getFooter().innerHTML = data[i].datetime;
+				marker.decorate(SMap.Marker.Feature.Card, card);
+				layer.addMarker(marker);
+			}
+
+			var cz = m.computeCenterZoom(coords);
+			m.setCenterZoom(cz[0], cz[1]);
+		</script>
+	</body>
+</html>
